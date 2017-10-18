@@ -1,23 +1,5 @@
 ---
 
-- name: Download client binary
-  get_url:
-    url: '{{ restic_url }}'
-    dest: '/tmp/'
-  register: get_url_restic
-
-- name: Decompress the binary
-  shell: "bzip2 -dc {{ get_url_restic.dest }} > {{ restic_install_path }}/restic"
-  args:
-    creates: '{{ restic_install_path }}/restic'
-
-- name: Ensure binary permissions are correct
-  file:
-    path: '{{ restic_install_path }}/restic'
-    mode: '0755'
-    owner: 'root'
-    group: 'root'
-
 - name: Ensure restic directories exist
   file:
     state: 'directory'
@@ -28,3 +10,29 @@
   with_items:
     - '/var/lib/restic'
     - '/var/log/restic'
+    - '{{ restic_download_path }}'
+
+- name: Download client binary
+  get_url:
+    url: '{{ restic_url }}'
+    dest: '/tmp/'
+  register: get_url_restic
+
+- name: Decompress the binary
+  shell: "bzip2 -dc {{ get_url_restic.dest }} > {{ restic_download_path }}/restic-{{ restic_version }}"
+  args:
+    creates: '{{ restic_download_path }}/restic-{{ restic_version }}'
+
+- name: Ensure binary permissions are correct
+  file:
+    path: '{{ restic_download_path }}/restic-{{ restic_version }}'
+    mode: '0755'
+    owner: 'root'
+    group: 'root'
+
+- name: Symlink the correct version to the bindir
+  file:
+    state: link
+    dest: "{{ restic_install_path }}/restic"
+    src: '{{ restic_download_path }}/restic-{{ restic_version }}'
+    force: true

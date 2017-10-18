@@ -1,5 +1,6 @@
 ---
 
+restic_download_path: '/opt/restic'
 restic_install_path: '/usr/local/bin'
 restic_password_file: '/var/lib/restic/repopw'
 restic_repo: '/tmp/test'
