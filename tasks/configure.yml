@@ -2,8 +2,8 @@
 
 - name: Deploy password file
   copy:
-    content: '{{ vault_repo_password }}'
-    dest: '/var/lib/restic/repopw'
+    content: '{{ restic_repo_password }}'
+    dest: '{{ restic_password_file }}'
     mode: '0600'
     owner: 'root'
     group: 'root'

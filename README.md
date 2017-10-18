@@ -20,7 +20,7 @@ restic_version: '0.7.1'
 restic_init_repo: true
 
 # this obviously goes into the vault
-vault_repo_password: 'foobar'
+restic_repo_password: 'foobar'
 ```
 
 Example configuration
