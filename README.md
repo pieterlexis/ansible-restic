@@ -17,6 +17,7 @@ restic_password_file: '/var/lib/restic/repopw'
 restic_repo: '/tmp/test'
 restic_url: 'https://github.com/restic/restic/releases/download/v{{ restic_version }}/restic_{{ restic_version }}_{{ _platform_suffix }}.bz2'
 restic_version: '0.7.1'
+restic_init_repo: true
 
 # this obviously goes into the vault
 vault_repo_password: 'foobar'

@@ -1,0 +1,7 @@
+---
+
+- name: Deploy cron script
+  template:
+    src: 'restic.cron.j2'
+    dest: '/etc/cron.d/restic'
+    mode: '0644'

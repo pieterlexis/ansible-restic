@@ -1,0 +1,30 @@
+---
+
+- name: Download client binary
+  get_url:
+    url: '{{ restic_url }}'
+    dest: '/tmp/'
+  register: get_url_restic
+
+- name: Decompress the binary
+  shell: "bzip2 -dc {{ get_url_restic.dest }} > {{ restic_install_path }}/restic"
+  args:
+    creates: '{{ restic_install_path }}/restic'
+
+- name: Ensure binary permissions are correct
+  file:
+    path: '{{ restic_install_path }}/restic'
+    mode: '0755'
+    owner: 'root'
+    group: 'root'
+
+- name: Ensure restic directories exist
+  file:
+    state: 'directory'
+    path:  '{{ item }}'
+    mode: '0755'
+    owner: 'root'
+    group: 'root'
+  with_items:
+    - '/var/lib/restic'
+    - '/var/log/restic'

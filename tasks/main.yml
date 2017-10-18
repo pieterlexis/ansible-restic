@@ -5,11 +5,15 @@
   set_fact:
     _platform_suffix: 'linux_amd64'
   when: ansible_userspace_bits == '64'
+  tags:
+    - always
 
 - name: set internal variable platform-suffix
   set_fact:
     _platform_suffix: 'linux_386'
   when: ansible_userspace_bits == '32'
+  tags:
+    - always
 
 - name: Set os dependent variables
   include_vars: "{{ item }}"
@@ -24,47 +28,28 @@
         - '../vars'
       skip: true
 
-- name: Download client binary
-  get_url:
-    url: '{{ restic_url }}'
-    dest: '/tmp/'
-  register: get_url_restic
+- name: Install restic
+  include_tasks: install.yml
+  tags:
+    - restic
+    - install
 
-- name: Decompress the binary
-  shell: "bzip2 -dc {{ get_url_restic.dest }} > {{ restic_install_path }}/restic"
-  args:
-    creates: '{{ restic_install_path }}/restic'
+- name: Configure restic
+  include_tasks: configure.yml
+  tags:
+    - restic
+    - configure
 
-- name: Ensure binary permissions are correct
-  file:
-    path: '{{ restic_install_path }}/restic'
-    mode: '0755'
-    owner: 'root'
-    group: 'root'
+- name: Initialize repo
+  include_tasks: initrepo.yml
+  when: restic_init_repo | bool
+  tags:
+    - restic
+    - configure
 
-- name: Ensure restic directories exist
-  file:
-    state: 'directory'
-    path:  '{{ item }}'
-    mode: '0755'
-    owner: 'root'
-    group: 'root'
-  with_items:
-    - '/var/lib/restic'
-    - '/var/log/restic'
-
-- name: Deploy password file
-  copy:
-    content: '{{ vault_repo_password }}'
-    dest: '/var/lib/restic/repopw'
-    mode: '0600'
-    owner: 'root'
-    group: 'root'
-  no_log: true
-  ignore_errors: true
-
-- name: Deploy cron script
-  template:
-    src: 'restic.cron.j2'
-    dest: '/etc/cron.d/restic'
-    mode: '0644'
+- name: Add cronjobs
+  include_tasks: cron.yml
+  tags:
+    - restic
+    - configure
+    - cron

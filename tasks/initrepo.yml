@@ -1,0 +1,16 @@
+---
+- name: Check if the repo already exists
+  command: '{{ restic_install_path }}/restic snapshots'
+  environment:
+    RESTIC_REPOSITORY: '{{ restic_repo }}'
+    RESTIC_PASSWORD_FILE: '{{ restic_password_file }}'
+  register: _restic_repo_check
+  failed_when: False
+  changed_when: False
+
+- name: Initialize repository
+  command: '{{ restic_install_path }}/restic init'
+  environment:
+    RESTIC_REPOSITORY: '{{ restic_repo }}'
+    RESTIC_PASSWORD_FILE: '{{ restic_password_file }}'
+  when: _restic_repo_check.rc == 1
