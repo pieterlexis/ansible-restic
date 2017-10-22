@@ -1,33 +1,6 @@
 ---
 # vi: set ft=ansible :
 
-- name: set internal variable platform-suffix
-  set_fact:
-    _platform_suffix: 'linux_amd64'
-  when: ansible_userspace_bits == '64'
-  tags:
-    - always
-
-- name: set internal variable platform-suffix
-  set_fact:
-    _platform_suffix: 'linux_386'
-  when: ansible_userspace_bits == '32'
-  tags:
-    - always
-
-- name: Set os dependent variables
-  include_vars: "{{ item }}"
-  with_first_found:
-    - files:
-      - '{{ ansible_distribution|lower }}-{{ ansible_distribution_version }}.yml'
-      - '{{ ansible_distribution|lower }}-{{ ansible_distribution_release }}.yml'
-      - '{{ ansible_distribution|lower }}-{{ ansible_distribution_major_version }}.yml'
-      - '{{ ansible_distribution|lower }}.yml'
-      - '{{ ansible_os_family|lower }}.yml'
-      paths:
-        - '../vars'
-      skip: true
-
 - name: Install restic
   include_tasks: install.yml
   tags:
