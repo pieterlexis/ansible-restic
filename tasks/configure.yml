@@ -17,3 +17,20 @@
     src: 'restic.cron.j2'
     dest: '/etc/cron.d/restic-{{ item.name }}'
     mode: '0644'
+
+- name: Check if the repo already exists
+  command: '{{ restic_install_path }}/restic snapshots'
+  environment:
+    RESTIC_REPOSITORY: '{{ restic_repo }}'
+    RESTIC_PASSWORD_FILE: '{{ restic_password_file }}'
+  register: _restic_repo_check
+  failed_when: False
+  changed_when: False
+  when: item.init | default(true) | bool()
+
+- name: Initialize repository
+  command: '{{ restic_install_path }}/restic init'
+  environment:
+      RESTIC_REPOSITORY: '{{ item.name }}'
+      RESTIC_PASSWORD_FILE: '/var/lib/restic/passwd_{{ item.name }}'
+  when: _restic_repo_check.rc == 1 and item.init | default(true) | bool()

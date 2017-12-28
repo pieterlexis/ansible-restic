@@ -22,6 +22,7 @@ restic_repos:
     password: 'foo'
     aws_access_key_id: 'ACCESS_KEY'
     aws_secret_access_key: 'SECRET_KEY'
+    init: true
 ```
 
 Example configuration
