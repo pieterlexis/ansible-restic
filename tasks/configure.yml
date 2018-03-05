@@ -1,5 +1,22 @@
 ---
 
+- name: Ensure password directory exists
+  file:
+    name: '/var/lib/restic'
+    state: directory
+    mode: 0755
+  with_items: '{{ restic_repos }}'
+  when: item.passwordfile | default(False) | bool
+
+- name: Deploy password file (if needed)
+  copy:
+    content: '{{ item.password | trim }}'
+    dest: '/var/lib/restic/{{ item.name }}'
+    mode: '0600'
+  no_log: True
+  with_items: '{{ restic_repos }}'
+  when: item.passwordfile | default(False) | bool
+
 - name: Deploy cron script
   template:
     src: 'restic.cron.j2'

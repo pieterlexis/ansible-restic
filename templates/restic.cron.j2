@@ -6,7 +6,11 @@
 SHELL=/bin/sh
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 RESTIC_REPOSITORY={{ item.url | trim | quote }}
+{% if item.passwordfile | default(False) | bool %}
+RESTIC_PASSWORD_FILE=/var/lib/restic/{{ item.name }}
+{% else %}
 RESTIC_PASSWORD={{ item.password | trim | quote }}
+{% endif %}
 {% if item.aws_access_key_id is defined %}
 AWS_ACCESS_KEY_ID={{ item.aws_access_key_id | trim | quote }}
 AWS_SECRET_ACCESS_KEY={{ item.aws_secret_access_key | trim | quote }}
